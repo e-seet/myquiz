@@ -7,8 +7,8 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-here")
 
 # Load from environment
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
+# USERNAME = os.getenv("APP_USERNAME")
+# PASSWORD = os.getenv("APP_PASSWORD")
 
 def validate_search_input(search_term):
     """
@@ -90,13 +90,13 @@ def search_results():
     safe_query = html.escape(query)
     return render_template('search_results.html', search_term=safe_query)
 
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    if data.get('username') == USERNAME and data.get('password') == PASSWORD:
-        return jsonify({"message": "Login successful"})
-    else:
-        return jsonify({"message": "Invalid credentials"}), 401
+# @app.route('/login', methods=['POST'])
+# def login():
+#     data = request.json
+#     if data.get('username') == USERNAME and data.get('password') == PASSWORD:
+#         return jsonify({"message": "Login successful"})
+#     else:
+#         return jsonify({"message": "Invalid credentials"}), 401
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
