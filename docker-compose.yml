@@ -1,6 +1,39 @@
 version: "3.8"
 
 services:
+  # PostgreSQL database for SonarQube
+  sonarqube-db:
+    image: postgres:13
+    container_name: sonarqube-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - sonarqube_db:/var/lib/postgresql/data
+    restart: always
+
+  # SonarQube service
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      - sonarqube-db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+      SONAR_SECURITY_REALM: sonar
+      SONAR_ADMIN_LOGIN: admin
+      SONAR_ADMIN_PASSWORD: 2202210@sit.singaporetech.edu.sg
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"   # SonarQube Web UI
+    restart: always
+
   gitea:
     image: gitea/gitea:latest
     container_name: gitea
@@ -33,3 +66,9 @@ services:
       git config --global user.name '$GIT_AUTHOR_NAME' &&
       git config --global user.email '$GIT_AUTHOR_EMAIL' &&
       python app/app.py"
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_db:
