@@ -1,1 +1,7 @@
 Flask==2.3.3
+pytest==8.4.1
+pytest-html==4.1.1
+pytest-cov==6.2.1
+selenium==4.25.0
+flask-testing==0.8.1
+bandit==1.7.10
