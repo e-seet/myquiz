@@ -90,7 +90,14 @@ jobs:
 
     - name: Dependency vulnerability check
       run: |
-        pip-audit --format=json --output=reports/pip-audit-results.json
+        pip-audit --format=json --output=reports/pip-audit-results.json || true
+        if jq '.[] | select(.vulns[]?.severity == "critical")' reports/pip-audit-results.json | grep -q .; then
+          echo "❌ Critical vulnerabilities found."
+          exit 1
+        else
+          echo "✅ No critical vulnerabilities."
+        fi
+
 
     - name: Run UI tests
       run: |
