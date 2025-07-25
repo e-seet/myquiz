@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Search App{% endblock %}
+
+{% block content %}
+    <h1>Search Results</h1>
+    
+    <div class="search-result">
+        <h2>Your Search Term:</h2>
+        <p style="font-size: 18px; font-weight: bold; color: #007bff;">{{ search_term }}</p>
+        
+        <p style="margin-top: 15px; color: #666;">
+            Your search term has been validated and is safe to display. 
+            In a real application, this would show search results for "{{ search_term }}".
+        </p>
+    </div>
+    
+    <a href="{{ url_for('home') }}">
+        <button type="button">Return to Home Page</button>
+    </a>
+{% endblock %}

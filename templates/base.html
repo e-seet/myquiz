@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{% block title %}Search App{% endblock %}</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+			background-color: #f5f5f5;
+		}
+
+		.container {
+			background-color: white;
+			padding: 30px;
+			border-radius: 8px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
+
+		input[type="text"] {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			font-size: 16px;
+			box-sizing: border-box;
+		}
+
+		button {
+			background-color: #007bff;
+			color: white;
+			padding: 10px 20px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 16px;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+
+		.alert {
+			padding: 15px;
+			margin-bottom: 20px;
+			border: 1px solid transparent;
+			border-radius: 4px;
+		}
+
+		.alert-error {
+			color: #721c24;
+			background-color: #f8d7da;
+			border-color: #f5c6cb;
+		}
+
+		.search-result {
+			background-color: #f8f9fa;
+			padding: 20px;
+			border-radius: 4px;
+			margin-bottom: 20px;
+			border-left: 4px solid #007bff;
+		}
+
+		h1 {
+			color: #333;
+			text-align: center;
+		}
+
+		h2 {
+			color: #555;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		{% for category, message in messages %}
+		<div class="alert alert-{{ category }}">{{ message }}</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+
+		{% block content %}{% endblock %}
+	</div>
+</body>
+
+</html>

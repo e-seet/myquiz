@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      GITEA__server__ROOT_URL: http://localhost:3000/
+    restart: always
+    volumes:
+      - ./gitea:/data
+    ports:
+      - "3000:3000"   # Web UI
+      - "2222:22"     # SSH access
+
+  git-flask:
+    build: .
+    container_name: git-flask
+    depends_on:
+      - gitea
+    environment:
+      - USERNAME=admin
+      - PASSWORD=2202210@sit.singaporetech.edu.sg
+      - GIT_AUTHOR_NAME=SEETBOXUEEDDIE
+      - GIT_AUTHOR_EMAIL=2202210@sit.singaporetech.edu.sg
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./app:/app/app
+    command: bash -c "
+      git config --global user.name '$GIT_AUTHOR_NAME' &&
+      git config --global user.email '$GIT_AUTHOR_EMAIL' &&
+      python app/app.py"
