@@ -4,10 +4,9 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
-  build-and-test:
+  security-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,20 +18,103 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Set up Node.js for ESLint
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pip-audit
+        pip install -r requirement.txt
+        pip install pytest pip-audit selenium pytest-html pytest-cov flask-testing
+
+    - name: Install ESLint and security plugins
+      run: |
+        npm install -g eslint
+        npm install -g eslint-plugin-security
+        npm install -g @eslint/create-config
+
+    - name: Initialize ESLint config
+      run: |
+        echo '{
+          "env": {
+            "browser": true,
+            "es2021": true
+          },
+          "extends": [
+            "eslint:recommended"
+          ],
+          "plugins": [
+            "security"
+          ],
+          "rules": {
+            "security/detect-object-injection": "error",
+            "security/detect-non-literal-regexp": "error",
+            "security/detect-unsafe-regex": "error",
+            "security/detect-buffer-noassert": "error",
+            "security/detect-child-process": "error",
+            "security/detect-disable-mustache-escape": "error",
+            "security/detect-eval-with-expression": "error",
+            "security/detect-no-csrf-before-method-override": "error",
+            "security/detect-non-literal-fs-filename": "error",
+            "security/detect-non-literal-require": "error",
+            "security/detect-possible-timing-attacks": "error",
+            "security/detect-pseudoRandomBytes": "error"
+          }
+        }' > .eslintrc.json
+
+    - name: Run ESLint security scanning
+      run: |
+        # Create a temporary JS file to scan templates for potential XSS
+        find templates -name "*.html" -exec grep -l "script\|javascript\|onclick\|onerror" {} \; > js_security_check.txt || true
+        if [ -s js_security_check.txt ]; then
+          echo "Potential security issues found in templates:"
+          cat js_security_check.txt
+        fi
+        # Scan any JavaScript files if they exist
+        find . -name "*.js" -not -path "./node_modules/*" | head -10 | xargs eslint --format=json --output-file=eslint-results.json || true
+
+    - name: Python security linting with bandit
+      run: |
+        pip install bandit
+        bandit -r . -f json -o bandit-results.json || true
+
+    - name: Run unit tests
+      run: |
+        pytest tests/test_unit.py -v --html=reports/unit-test-report.html --cov=app --cov-report=html:reports/coverage
 
     - name: Run integration tests
       run: |
-        pytest tests/test_integration.py
+        pytest tests/test_integration.py -v --html=reports/integration-test-report.html
 
     - name: Dependency vulnerability check
       run: |
-        pip-audit
+        pip-audit --format=json --output=reports/pip-audit-results.json
 
     - name: Run UI tests
       run: |
-        pytest tests/test_ui.py
+        # Start the Flask app in background
+        python app/app.py &
+        APP_PID=$!
+        sleep 5
+        # Run UI tests
+        pytest tests/test_ui.py -v --html=reports/ui-test-report.html
+        # Stop the Flask app
+        kill $APP_PID
+
+    - name: Upload test reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-reports
+        path: reports/
+
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          eslint-results.json
+          bandit-results.json
