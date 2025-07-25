@@ -3,26 +3,23 @@
 {% block title %}Home - Search App{% endblock %}
 
 {% block content %}
-    <h1>Search Application</h1>
-    
-    <form method="POST" action="{{ url_for('home') }}">
-        <div class="form-group">
-            <label for="search_term">Enter your search term:</label>
-            <input type="text" 
-                   id="search_term" 
-                   name="search_term" 
-                   placeholder="Enter search term here..." 
-                   required
-                   maxlength="100">
-        </div>
-        
-        <button type="submit">Search</button>
-    </form>
-    
-    <div style="margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 4px;">
-        <h3>Security Notice</h3>
-        <p>This search form includes protection against XSS and SQL injection attacks. 
-           Please enter only alphanumeric characters and spaces in your search term.</p>
-        <p><strong>Invalid characters:</strong> &lt; &gt; " ' ; ( ) { } and script tags</p>
-    </div>
+<h1>Search Application</h1>
+
+<form method="POST" action="{{ url_for('home') }}">
+	{{ csrf_token() }}
+	<div class="form-group">
+		<label for="search_term">Enter your search term:</label>
+		<input type="text" id="search_term" name="search_term" placeholder="Enter search term here..." required
+			maxlength="100">
+	</div>
+
+	<button type="submit">Search</button>
+</form>
+
+<div style="margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 4px;">
+	<h3>Security Notice</h3>
+	<p>This search form includes protection against XSS and SQL injection attacks.
+		Please enter only alphanumeric characters and spaces in your search term.</p>
+	<p><strong>Invalid characters:</strong> &lt; &gt; " ' ; ( ) { } and script tags</p>
+</div>
 {% endblock %}
