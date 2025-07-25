@@ -1,5 +1,6 @@
-Flask==2.3.3
+Flask==2.2.5
 Flask-WTF==1.1.1
+Werkzeug==2.2.3
 pytest==8.4.1
 pytest-html==4.1.1
 pytest-cov==6.2.1
