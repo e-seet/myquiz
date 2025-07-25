@@ -9,6 +9,11 @@ app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-here")
 
 # Enable CSRF protection
 csrf = CSRFProtect(app)
+csrf.init_app(app)
+
+# Disable CSRF in testing
+if os.getenv("FLASK_ENV") == "testing":
+    app.config['WTF_CSRF_ENABLED'] = False
 
 def validate_search_input(search_term):
     """
